@@ -1,0 +1,153 @@
+Github graphql explorer
+
+query MyFirstQuery {
+  viewer {
+    id
+    name
+    avatarUrl
+    login
+    createdAt
+  }
+}
+
+--------------- query
+query MyFirstQuery {
+  repository(name: "graphql", owner: "facebook") {
+    createdAt
+    description
+    id
+  }
+}
+----------------- Alias
+query MyFirstQuery {
+  DotnetCoreRepo: repository(name: "core", owner: "dotnet") {
+    createdAt
+    description
+  }
+  
+  WPFRepo: repository(name: "wpf", owner: "dotnet") {
+    createdAt
+    description
+    id
+    url
+  }
+}
+------------------fragments
+query MyFirstQuery {
+  DotnetCoreRepo: repository(name: "core", owner: "dotnet") {
+    ...RepositoryCommonField
+  }
+  WPFRepo: repository(name: "wpf", owner: "dotnet") {
+    ...RepositoryCommonField
+    id
+  }
+}
+
+fragment RepositoryCommonField on Repository {
+  createdAt
+  description
+  url
+}
+
+-----------------Variables
+query DotNetRepo($name:String! $owner:String!) {
+  repository(name:$name owner:$owner){
+    id
+    name
+    description
+    url
+  }
+}
+
+variables:
+{
+  "name":"wpf",
+  "owner": "dotnet"
+}
+
+------------------mutations (will craete a new repo on github)
+mutation AddRepo($input: CreateProjectInput!) {
+  createProject(input: $input) {
+    clientMutationId
+    project {
+      id
+      createdAt
+      url
+    }
+  }
+}
+
+variables:
+{
+  "input": {
+    "ownerId": "MDQ6VXNlcjI4ODQzNzQ4",
+    "name": "My first GraphQL Project",
+    "body": "I'm trying to create my first graphql project via API",
+    "clientMutationId": "1234567890"
+  }
+}
+
+==========================
+NuGet to install:
+graphql.server.transports.aspnetcore.system
+graphiql
+
+folders: Type, Query, Schema, Mutations
+
+Steps:
+Create Graphql types
+Create Graphql Queries
+Create Graphql Schema
+Register Graphql types
+Create Graphql Mutations
+
+
+==================
+C# playground
+
+Query:
+query FirstGraphQLQuery {
+  product(id: 1) {
+    id
+    name
+  }
+}
+
+
+
+Mutation:
+mutation AddProduct($product: ProductInputType) {
+  createProduct(product: $product) {
+    id
+    name
+    price
+  }
+}
+
+{
+  "product": {
+    "id": 2,
+    "name": "Mango Juice",
+    "price": 25
+  }
+}
+++++++++++++++++
+mutation UpdateProduct($id: Int $product: ProductInputType) {
+  updateProduct(id:$id product: $product) {
+    id
+    name
+    price
+  }
+}
+
+{
+  "id": 2,
+  "product": {
+    "id": 2,
+    "name": "Banana Shake",
+    "price": 35
+  }
+}
+++++++++++++++++
+
+

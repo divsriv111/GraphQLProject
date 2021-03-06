@@ -10,9 +10,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphiQl;
+using GraphQL.Server;
+using GraphQL.Types;
 using GraphQLProject.Interfaces;
 using GraphQLProject.Models;
+using GraphQLProject.Query;
+using GraphQLProject.Schema;
 using GraphQLProject.Services;
+using GraphQLProject.Type;
 
 namespace GraphQLProject
 {
@@ -29,7 +35,16 @@ namespace GraphQLProject
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddTransient<IProduct,ProductService>();
+            services.AddTransient<IProduct, ProductService>();
+            services.AddSingleton<ProductType>();
+            services.AddSingleton<ProductQuery>();
+            services.AddSingleton<ISchema, ProductSchema>();
+
+            services.AddGraphQL(options =>
+                {
+                    options.EnableMetrics = false;
+                }
+            ).AddSystemTextJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,6 +54,9 @@ namespace GraphQLProject
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseGraphiQl("/graphql");
+            app.UseGraphQL<ISchema>();
 
             app.UseHttpsRedirection();
 
